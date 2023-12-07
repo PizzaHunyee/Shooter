@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Shooter Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height - 30,
+            width: 30,
+            height: 30,
+            speed: 5
+        };
+
+        const bullets = [];
+
+        function drawPlayer() {
+            ctx.beginPath();
+            ctx.rect(player.x - player.width / 2, player.y - player.height / 2, player.width, player.height);
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawBullets() {
+            for (const bullet of bullets) {
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = 'red';
+                ctx.fill();
+                ctx.closePath();
+            }
+        }
+
+        function updateBullets() {
+            bullets.forEach(bullet => {
+                bullet.y -= 5;
+            });
+
+            bullets.forEach((bullet, index) => {
+                if (bullet.y < 0) {
+                    bullets.splice(index, 1);
+                }
+            });
+        }
+
+        function gameLoop() {
+            updateBullets();
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawPlayer();
+            drawBullets();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function shoot() {
+            bullets.push({ x: player.x, y: player.y - player.height / 2 });
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft' && player.x - player.width / 2 > 0) {
+                player.x -= player.speed;
+            } else if (e.key === 'ArrowRight' && player.x + player.width / 2 < canvas.width) {
+                player.x += player.speed;
+            } else if (e.key === ' ') {
+                shoot();
+            }
+        });
+
+        gameLoop();
+    </script>
+</body>
+</html>
